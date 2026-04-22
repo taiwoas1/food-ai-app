@@ -1,53 +1,34 @@
+const API_URL = 'http://localhost:5000/image-recognition';
+
+const NON_FOOD = [
+  'chair', 'table', 'phone', 'car', 'person', 'building',
+  'computer', 'book', 'bottle', 'bag', 'shoe', 'clothing',
+  'animal', 'dog', 'cat', 'plant', 'flower', 'tree',
+  'furniture', 'vehicle', 'electronic', 'instrument',
+];
+
 export async function identifyFood(imageBase64) {
-  const response = await fetch('http://localhost:5000/image-recognition', {
+  const response = await fetch(API_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      user_app_id: {
-        user_id: 'clarifai',
-        app_id: 'main',
-      },
-      inputs: [
-        {
-          data: {
-            image: {
-              base64: imageBase64,
-            },
-          },
-        },
-      ],
+      user_app_id: { user_id: 'clarifai', app_id: 'main' },
+      inputs: [{ data: { image: { base64: imageBase64 } } }],
     }),
   });
 
   const data = await response.json();
+  const concepts = data?.outputs?.[0]?.data?.concepts;
 
-  if (!data.outputs || !data.outputs[0].data.concepts) {
-    throw new Error('No results returned');
-  }
+  if (!concepts) throw new Error("Couldn't read anything from that image.");
 
-  const concepts = data.outputs[0].data.concepts;
-
-  return concepts.slice(0, 3).map((item) => ({
+  return concepts.slice(0, 3).map(item => ({
     name: item.name,
     confidence: (item.value * 100).toFixed(1),
   }));
 }
 
 export function isEdible(foodName) {
-  const nonEdibleKeywords = [
-    'chair', 'table', 'phone', 'car', 'person', 'building',
-    'computer', 'book', 'bottle', 'bag', 'shoe', 'clothing',
-    'animal', 'dog', 'cat', 'plant', 'flower', 'tree',
-    'furniture', 'vehicle', 'electronic', 'instrument'
-  ];
-
   const name = foodName.toLowerCase();
-  for (const keyword of nonEdibleKeywords) {
-    if (name.includes(keyword)) {
-      return false;
-    }
-  }
-  return true;
+  return !NON_FOOD.some(keyword => name.includes(keyword));
 }
