@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-require('dotenv').config({ path: '../.env' });
-
+require('dotenv').config();
+const { getCalories } = require('./nutritionData');
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -58,6 +58,7 @@ app.get('/usage-stats', (req, res) => {
   });
 });
 
-app.listen(5000, () => {
-  console.log('Backend server running on http://localhost:5000');
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('Backend server running on port ${PORT}');
 });
