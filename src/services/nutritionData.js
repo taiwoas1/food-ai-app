@@ -35,7 +35,7 @@ const calorieData = {
   juice: { calories: 45, protein: '0.7g', carbs: '10g', fat: '0.2g' },
 };
 
-export function getCalories(foodName) {
+ function getCalories(foodName) {
   const key = foodName.toLowerCase();
 
   if (calorieData[key]) {
@@ -50,3 +50,4 @@ export function getCalories(foodName) {
 
   return { calories: 'Unknown', protein: '?', carbs: '?', fat: '?' };
 }
+export { getCalories };
